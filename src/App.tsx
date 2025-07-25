@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
+import { Textarea } from './components/ui/textarea'
 import { ScrollArea } from './components/ui/scroll-area'
 import { Separator } from './components/ui/separator'
 import { Plus, Send, MessageSquare, Search, Settings, User, MoreHorizontal } from 'lucide-react'
@@ -125,6 +126,16 @@ function App() {
       e.preventDefault()
       sendMessage()
     }
+  }
+
+  // Auto-resize textarea
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputMessage(e.target.value)
+    
+    // Auto-resize textarea
+    const textarea = e.target
+    textarea.style.height = 'auto'
+    textarea.style.height = Math.min(textarea.scrollHeight, 128) + 'px'
   }
 
   return (
@@ -282,17 +293,19 @@ function App() {
                   )}
                 </div>
                 
-                <div className={`max-w-xs lg:max-w-2xl ${message.isUser ? 'text-right' : ''}`}>
+                <div className={`max-w-xs lg:max-w-2xl xl:max-w-3xl ${message.isUser ? 'text-right' : ''}`}>
                   <div
-                    className={`px-4 py-3 rounded-2xl shadow-sm ${
+                    className={`px-5 py-4 rounded-2xl shadow-sm ${
                       message.isUser
                         ? 'bg-primary text-white rounded-br-md'
                         : 'bg-gray-100 text-gray-900 rounded-bl-md'
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{message.content}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {message.content}
+                    </p>
                   </div>
-                  <p className={`text-xs mt-2 ${
+                  <p className={`text-xs mt-2 px-1 ${
                     message.isUser ? 'text-gray-400' : 'text-gray-500'
                   }`}>
                     {message.timestamp.toLocaleTimeString([], { 
@@ -328,25 +341,26 @@ function App() {
           <div className="max-w-4xl mx-auto">
             <div className="flex items-end space-x-3">
               <div className="flex-1 relative">
-                <Input
+                <Textarea
                   placeholder="Message Student Haus..."
                   value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  className="pr-12 py-3 rounded-full border-gray-200 focus:border-primary shadow-sm"
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
+                  className="pr-12 py-3 min-h-[48px] max-h-32 resize-none rounded-2xl border-gray-200 focus:border-primary shadow-sm text-sm leading-relaxed"
+                  rows={1}
                 />
                 {/* Circular Send Button */}
                 <Button 
                   onClick={sendMessage}
                   disabled={!inputMessage.trim()}
-                  className="absolute right-1 top-1 w-8 h-8 rounded-full p-0 bg-primary hover:bg-primary/90 text-white disabled:bg-gray-300 shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="absolute right-2 bottom-2 w-8 h-8 rounded-full p-0 bg-primary hover:bg-primary/90 text-white disabled:bg-gray-300 shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-3 text-center">
-              Student Haus AI can make mistakes. Please verify important information.
+              Student Haus AI can make mistakes. Please verify important information. Press Shift+Enter for new line.
             </p>
           </div>
         </div>
